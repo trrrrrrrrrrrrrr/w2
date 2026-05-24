@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа №2 – HTTP-запросы</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Лабораторная работа №2</h1>
+        <h2>Исследование HTTP-протокола с помощью PuTTY</h2>
+       
+
+        <!-- Часть 1: Заливка файлов через Git -->
+        <section>
+            <h3>1. Размещение файлов на сервере через Git</h3>
+            <div class="screenshots">
+                <figure>
+                    <img src="0.1.png" alt="Содержимое локального каталога">
+                    <figcaption>Рис. 1 – Локальные файлы проекта</figcaption>
+                </figure>
+                <figure>
+                    <img src="0.2.png" alt="Git add, commit, push">
+                    <figcaption>Рис. 2 – Отправка файлов в репозиторий GitHub</figcaption>
+                </figure>
+                <figure>
+                    <img src="0.3.png" alt="Git clone на учебном сервере">
+                    <figcaption>Рис. 3 – Клонирование репозитория на сервер (git clone)</figcaption>
+                </figure>
+            </div>
+            <p class="note">После клонирования репозитория все файлы  стали доступны по адресу <code>http://u82311.kubsu-dev.ru/w2/</code>.</p>
+        </section>
+
+        <!-- Часть 2: Выполнение HTTP-запросов через PuTTY -->
+        <section>
+            <h3>2. HTTP-запросы к веб-серверу</h3>
+            <p>Все запросы отправлялись через программу <strong>PuTTY</strong> (подключение по SSH к <code>u82311.kubsu-dev.ru</code>). Настройки подключения показаны на рис. 6.</p>
+            <figure class="full-width">
+                <img src="0.5.png" alt="Настройки PuTTY">
+                <figcaption>Рис. 4 – Конфигурация PuTTY для соединения с сервером</figcaption>
+            </figure>
+            <p>Примеры всех запросов были предварительно записаны в файл <code>http.txt</code> (рис. 7).</p>
+            <figure class="full-width">
+                <img src="0.4.png" alt="Список запросов в http.txt">
+                <figcaption>Рис. 5 – Текст отправляемых HTTP-запросов</figcaption>
+            </figure>
+        </section>
+
+        <!-- Задание 1: GET / HTTP/1.0 -->
+        <section>
+            <h3>2.1. Получение главной страницы методом GET (HTTP/1.0)</h3>
+            <p><strong>Запрос:</strong> <code>GET / HTTP/1.0</code></p>
+            <figure>
+                <img src="1.png" alt="Ответ на GET / HTTP/1.0">
+                <figcaption>Рис. 6 – Ответ сервера: статус 200 OK, HTML-код страницы</figcaption>
+            </figure>
+            <p>Сервер вернул стандартную страницу приветствия Apache2 Ubuntu.</p>
+        </section>
+
+        <!-- Задание 2: GET /w2/index.php HTTP/1.1 -->
+        <section>
+            <h3>2.2. Получение внутренней страницы методом GET (HTTP/1.1)</h3>
+            <p><strong>Запрос:</strong> <code>GET /w2/index.php HTTP/1.1</code></p>
+            <figure>
+                <img src="2.png" alt="GET /w2/index.php">
+                <figcaption>Рис. 7 – Ответ сервера: статус 404 Not Found (специально задано в скрипте)</figcaption>
+            </figure>
+            <p>Файл <code>index.php</code> на сервере возвращает <code>404</code> и выводит массив данных, что соответствует логике задания (код 404 не является ошибкой, а особенностью реализации).</p>
+        </section>
+
+        <!-- Задание 3: HEAD file.tar.gz -->
+        <section>
+            <h3>2.3. Определение размера файла file.tar.gz без его скачивания</h3>
+            <p><strong>Запрос:</strong> <code>HEAD /w2/file.tar.gz HTTP/1.1</code></p>
+            <figure>
+                <img src="3.png" alt="HEAD file.tar.gz">
+                <figcaption>Рис. 8 – Заголовок ответа: Content-Length = 11335 байт</figcaption>
+            </figure>
+            <p>Размер файла <strong>11335 байт</strong> (около 11 КБ).</p>
+        </section>
+
+        <!-- Задание 4: HEAD image.png -->
+        <section>
+            <h3>2.4. Определение медиатипа ресурса /image.png</h3>
+            <p><strong>Запрос:</strong> <code>HEAD /w2/image.png HTTP/1.1</code></p>
+            <figure>
+                <img src="4.png" alt="HEAD image.png">
+                <figcaption>Рис. 9 – Заголовок ответа: Content-Type = image/png</figcaption>
+            </figure>
+            <p>Медиатип – <code>image/png</code>.</p>
+        </section>
+
+        <!-- Задание 5: POST /index.php с комментарием -->
+        <section>
+            <h3>2.5. Отправка комментария на сервер (POST)</h3>
+            <p><strong>Запрос:</strong> <code>POST /w2/index.php HTTP/1.1</code> с телом <code>comment=Hello</code></p>
+            <figure>
+                <img src="5.png" alt="POST comment">
+                <figcaption>Рис. 10 – Ответ сервера: выводит массив с переданным параметром и снова "Привет, мир!"</figcaption>
+            </figure>
+            <p>Сервер принял параметр <code>comment</code> и вернул его в массиве. Код ответа – 404, как и в задании 2.2.</p>
+        </section>
+
+        <!-- Задание 6: Range запрос первых 100 байт -->
+        <section>
+            <h3>2.6. Получение первых 100 байт файла file.tar.gz</h3>
+            <p><strong>Запрос:</strong> <code>GET /w2/file.tar.gz HTTP/1.1</code> с заголовком <code>Range: bytes=0-99</code></p>
+            <figure>
+                <img src="6.png" alt="Range запрос">
+                <figcaption>Рис. 11 – Ответ с кодом 206 Partial Content, Content-Length=100</figcaption>
+            </figure>
+            <p>Сервер вернул ровно 100 байт бинарных данных.</p>
+        </section>
+
+        <!-- Задание 7: HEAD /index.php для определения кодировки -->
+        <section>
+            <h3>2.7. Определение кодировки ресурса /index.php</h3>
+            <p><strong>Запрос:</strong> <code>HEAD /w2/index.php HTTP/1.1</code></p>
+            <figure>
+                <img src="7.png" alt="HEAD index.php">
+                <figcaption>Рис. 12 – Заголовок ответа: Content-Type = text/html; charset=UTF-8</figcaption>
+            </figure>
+            <p>Кодировка ресурса – <code>UTF-8</code>.</p>
+        </section>
+
+       
+        <section>
+            <h3>1. Обновление файлов на сервере через Git</h3>
+            <div class="screenshots">
+                <figure>
+                    <img src="f1.png" alt="Добавление новых скриншотов в Git">
+                    <figcaption>Рис. 13 – Коммит и пуш дополнительных скриншотов</figcaption>
+                </figure>
+                <figure>
+                    <img src="f2.png" alt="git pull на сервере">
+                    <figcaption>Рис. 14 – Синхронизация изменений на сервере (git pull)</figcaption>
+                </figure>
+            </div>
+            <p class="note">После клонирования репозитория все файлы (index.php, style.css, изображения) стали доступны по адресу <code>http://u82311.kubsu-dev.ru/w2/</code>.</p>
+        </section>
+    </div>
+</body>
+</html>
